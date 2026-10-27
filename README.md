@@ -1,1 +1,1 @@
-# latin-dance-corner
+# Latin Dance Corner
