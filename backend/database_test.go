@@ -3,7 +3,7 @@ package backend
 import (
 	"database/sql"
 	"testing"
-	_ "github.com/jackc/pgx/v5"
+	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 var TEST_DB_CONN string = "postgres://testuser:testpass@127.0.0.1:5433/app_test?sslmode=disable"
@@ -20,7 +20,7 @@ func TestStoreRetrieve(t *testing.T){
 	
 	affected, err := StoreMove(db, toAdd)
 	if err != nil {
-		t.Fatalf("error storing move", )
+		t.Fatalf("error storing move: %s", err.Error())
 	}
 
 	if affected != 1 {
@@ -32,7 +32,8 @@ func TestStoreRetrieve(t *testing.T){
 		t.Fatalf("error getting moves list: %s", err.Error())
 	}
 	
-	if moves[0] != toAdd {
-		t.Fatalf("moves are not equal")
-	}
+	if (moves[0].Name != toAdd.Name || moves[0].Description != toAdd.Description || 
+		moves[0].Image != toAdd.Image){
+			t.Fatalf("moves are not equal")
+	}	
 }

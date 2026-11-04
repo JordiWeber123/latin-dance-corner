@@ -17,7 +17,7 @@ var COLUMNS [4]string = [4]string{"id", "name", "description", "image"}
 
 func StoreMove(db *sql.DB , move Move) (int64, error) {
 	//TODO: Do I have to colon-terminate?
-	query := fmt.Sprintf("INSERT INTO %s (name, description, image) VALUES ($1, $2, $3, $4);", 
+	query := fmt.Sprintf("INSERT INTO %s (name, description, image) VALUES ($1, $2, $3);", 
 		TABLE_NAME)
 	result, err :=db.Exec(query, move.Name, move.Description, move.Image)
 	if err != nil {
