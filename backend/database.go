@@ -9,7 +9,7 @@ import (
 )
 
 type Driver interface {
-	OpenDatabase(ctx context.Context) (*sql.DB)
+	OpenDatabase(ctx context.Context) *sql.DB
 }
 
 var TABLE_NAME string = "moves"
@@ -36,31 +36,31 @@ func GetMoveById(db *sql.DB, id int64) (Move, error){
 		return Move{}, err
 	}
 	defer rows.Close()
-	var res Move;
+	var res Move
 
 	//rows.Scan(&res)
 	ok := rows.Next()
 	err = rows.Err()
-	if !ok && err == nil{
+	if !ok && err == nil {
 
 	}
 	err = rows.Scan(&res.Id, &res.Name, &res.Description, &res.Image)
 	return res, err
 }
 
-func GetNMovesSorted(db *sql.DB, n int, sortBy string) ([]Move, error){
+func GetNMovesSorted(db *sql.DB, n int, sortBy string) ([]Move, error) {
 	if !slices.Contains(COLUMNS[:], strings.ToLower(sortBy)) {
 		return make([]Move, 0), fmt.Errorf("no column named: %s", sortBy)
 	}
 	res := make([]Move, 0, n)
 	query := fmt.Sprintf("SELECT * FROM %s ORDER BY $1 LIMIT $2", TABLE_NAME)
 	rows, err := db.Query(query, sortBy, n)
-	if err != nil{
+	if err != nil {
 		return make([]Move, 0), err
 	}
 
 	defer rows.Close()
-	for ; rows.Next(); {
+	for rows.Next() {
 		err = rows.Err()
 		if err != nil {
 			return res, err
@@ -72,7 +72,7 @@ func GetNMovesSorted(db *sql.DB, n int, sortBy string) ([]Move, error){
 		}
 		res = append(res, current)
 	}
-	return res, rows.Err()	
+	return res, rows.Err()
 }
 
 func DeleteMove(db *sql.DB, id int64) (bool, error) {
