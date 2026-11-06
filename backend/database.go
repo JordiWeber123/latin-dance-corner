@@ -1,4 +1,4 @@
-package backend
+package main
 
 import (
 	"context"
@@ -15,20 +15,22 @@ type Driver interface {
 var TABLE_NAME string = "moves"
 var COLUMNS [4]string = [4]string{"id", "name", "description", "image"}
 
+//Stores a given move into the database
 func StoreMove(db *sql.DB , move Move) (int64, error) {
 	//TODO: Do I have to colon-terminate?
-	query := fmt.Sprintf("INSERT INTO %s (name, description, image) VALUES ($1, $2, $3);", 
+	query := fmt.Sprintf("INSERT INTO %s (name, dance_style, difficulty, description, image) VALUES ($1, $2, $3, $4, $5)", 
 		TABLE_NAME)
-	result, err :=db.Exec(query, move.Name, move.Description, move.Image)
+	result, err := db.Exec(query, move.Name, move.DanceStyle, move.Difficulty, move.Description, move.Image)
 	if err != nil {
 		return 0, err
 	}
 	return result.RowsAffected()
 }
 
+//Gets a move from its id on the database
 func GetMoveById(db *sql.DB, id int64) (Move, error){
 	//TODO: Do I have to colon-terminate?
-	query := "SELECT * FROM WHERE id = $1"
+	query := fmt.Sprintf("SELECT * FROM %s WHERE id = $1", TABLE_NAME)
 	rows, err:= db.Query(query, id)
 	if err != nil {
 		return Move{}, err

@@ -1,8 +1,9 @@
-package backend
+package main
 
 import (
 	"database/sql"
 	"testing"
+
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
@@ -14,9 +15,13 @@ func TestStoreRetrieve(t *testing.T){
 	if err != nil {
 		t.Fatalf("error while opening DB: %s", err.Error())
 	}
-	toAdd := Move{Name: "Inside turn", 
-	Description: "Lead: Prepare a hand by raising it up between counts 3 and 4, then on 5 pass it over and around the follow's head, forming a circle",
-	Image: "img.png"}
+	toAdd := Move{
+		Name: "Inside turn",
+		DanceStyle: "Bachata",
+		Difficulty: 1,
+		Description: "Lead: Prepare a hand by raising it up between counts 3 and 4, then on 5 pass it over and around the follow's head, forming a circle",
+		Image: "img.png",
+	}
 	
 	affected, err := StoreMove(db, toAdd)
 	if err != nil {
@@ -31,9 +36,16 @@ func TestStoreRetrieve(t *testing.T){
 	if err != nil {
 		t.Fatalf("error getting moves list: %s", err.Error())
 	}
+	found := false
+	for _, move := range moves {
+		if (move.Name == toAdd.Name && move.Description == toAdd.Description && 
+		move.Image == toAdd.Image){
+			found = true
+			break
+		}	
+	}
 	
-	if (moves[0].Name != toAdd.Name || moves[0].Description != toAdd.Description || 
-		moves[0].Image != toAdd.Image){
-			t.Fatalf("moves are not equal")
-	}	
+	if !found {
+		t.Fatalf("move was not added")
+	}
 }
