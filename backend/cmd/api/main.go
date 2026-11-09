@@ -2,21 +2,34 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
+	"log"
+	"net/http"
+	"os"
 
 	"github.com/JordiWeber123/latin-dance-corner/internal/server"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 func main() {
-	//placeholder
-	var TEST_DB_CONN string = "postgres://testuser:testpass@127.0.0.1:5433/app_test?sslmode=disable"
-	db, err := sql.Open("pgx", TEST_DB_CONN)
-	if err != nil {
-		fmt.Printf("error while opening DB: %s", err.Error())
-		return
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	addr := ":" + port
+	db_link := os.Getenv("DB_CONN_STR")
+	if db_link == "" {
+		log.Fatal("no database, empty connection link ")
 	}
 
-	move, err := server.GetMoveById(db, 1)
-	fmt.Println(move, err)
+	db, err := sql.Open("pgx", db_link)
+	if err != nil {
+		log.Fatalf("couldn't connect to database: %v\n", err)
+	}
+
+	apiCfg := server.ApiConfig{DB: db}
+
+	log.Printf("API listening on http://localhost%s", addr)
+	if err := http.ListenAndServe(addr, server.New(&apiCfg)); err != nil {
+		log.Fatal(err)
+	}
 }
