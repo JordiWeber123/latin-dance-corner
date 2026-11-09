@@ -74,7 +74,11 @@ func (apiCfg *ApiConfig) handleGetAll(w http.ResponseWriter, r *http.Request){
 		log.Printf("error in server: %s", err.Error())
 		return
 	}
-	writeJSON(w, http.StatusOK, moves)
+
+	body := map[string][]Move {
+		"moves" : moves,
+	}
+	writeJSON(w, http.StatusOK, body)
 }
 
 
