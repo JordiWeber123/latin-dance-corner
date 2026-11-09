@@ -1,9 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"database/sql"
-	"github.com/JordiWeber123/latin-dance-corner"
+	"fmt"
+
+	"github.com/JordiWeber123/latin-dance-corner/internal/server"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
@@ -16,6 +17,6 @@ func main() {
 		return
 	}
 
-	move, err := backend.GetMoveById(db, 1)
+	move, err := server.GetMoveById(db, 1)
 	fmt.Println(move, err)
 }

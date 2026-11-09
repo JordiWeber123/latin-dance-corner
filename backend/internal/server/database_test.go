@@ -1,4 +1,4 @@
-package backend
+package server
 
 import (
 	"database/sql"
@@ -23,7 +23,7 @@ func TestStoreRetrieve(t *testing.T){
 		Image: "img.png",
 	}
 	
-	affected, err := StoreMove(db, toAdd)
+	affected, err := CreateMove(db, toAdd)
 	if err != nil {
 		t.Fatalf("error storing move: %s", err.Error())
 	}
@@ -32,7 +32,7 @@ func TestStoreRetrieve(t *testing.T){
 		t.Fatalf("wrong number of affected rows %d != 1", affected)
 	}
 	
-	moves, err := GetNMovesSorted(db, 1, "id")
+	moves, err := GetMultiPaginated(db, 1, 0)
 	if err != nil {
 		t.Fatalf("error getting moves list: %s", err.Error())
 	}

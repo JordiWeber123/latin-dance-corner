@@ -1,11 +1,9 @@
-package backend
+package server
 
 import (
 	"context"
 	"database/sql"
 	"fmt"
-	"slices"
-	"strings"
 )
 
 type Driver interface {
@@ -16,7 +14,7 @@ var TABLE_NAME string = "moves"
 var COLUMNS [4]string = [4]string{"id", "name", "description", "image"}
 
 //Stores a given move into the database
-func StoreMove(db *sql.DB , move Move) (int64, error) {
+func CreateMove(db *sql.DB , move Move) (int64, error) {
 	//TODO: Do I have to colon-terminate?
 	query := fmt.Sprintf("INSERT INTO %s (name, dance_style, difficulty, description, image) VALUES ($1, $2, $3, $4, $5)", 
 		TABLE_NAME)
@@ -38,23 +36,25 @@ func GetMoveById(db *sql.DB, id int64) (Move, error){
 	defer rows.Close()
 	var res Move
 
-	//rows.Scan(&res)
 	ok := rows.Next()
 	err = rows.Err()
 	if !ok && err == nil {
-
+		return Move{}, err
 	}
-	err = rows.Scan(&res.Id, &res.Name, &res.Description, &res.Image)
+	err = rows.Scan(&res.Id, 
+		&res.Name, 
+		&res.DanceStyle,
+		&res.Difficulty, 
+		&res.Description, 
+		&res.Image,
+		&res.CreatedAt)
 	return res, err
 }
 
-func GetNMovesSorted(db *sql.DB, n int, sortBy string) ([]Move, error) {
-	if !slices.Contains(COLUMNS[:], strings.ToLower(sortBy)) {
-		return make([]Move, 0), fmt.Errorf("no column named: %s", sortBy)
-	}
-	res := make([]Move, 0, n)
-	query := fmt.Sprintf("SELECT * FROM %s ORDER BY $1 LIMIT $2", TABLE_NAME)
-	rows, err := db.Query(query, sortBy, n)
+func GetMultiPaginated(db *sql.DB, page_size int, offset int) ([]Move, error) {
+	res := make([]Move, 0, page_size)
+	query := fmt.Sprintf("SELECT * FROM %s LIMIT $1 OFFSET $2", TABLE_NAME)
+	rows, err := db.Query(query, page_size, offset)
 	if err != nil {
 		return make([]Move, 0), err
 	}
@@ -66,7 +66,13 @@ func GetNMovesSorted(db *sql.DB, n int, sortBy string) ([]Move, error) {
 			return res, err
 		}
 		var current Move
-		err = rows.Scan(&current.Id, &current.Name, &current.Description, &current.Image)
+		err = rows.Scan(&current.Id, 
+			&current.Name, 
+			&current.DanceStyle,
+			&current.Difficulty, 
+			&current.Description, 
+			&current.Image,
+			&current.CreatedAt)
 		if err != nil {
 			return res, err
 		}
