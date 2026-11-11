@@ -15,6 +15,15 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+      - name: Diagnose issues
+        working-directory: ./backend
+        shell: pwsh
+        run: |
+          whoami
+          Get-Location
+          Get-ChildItem -Name Makefile*
+          Write-Host "PATH=$env:PATH"
+          Get-Command make -ErrorAction SilentlyContinue | Select-Object Name, Source
       - name: Test backend
         working-directory: ./backend
         shell: pwsh
