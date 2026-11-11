@@ -17,7 +17,7 @@ jobs:
           persist-credentials: false
       - name: Diagnose issues
         working-directory: ./backend
-        shell: pwsh
+        shell: powershell
         run: |
           whoami
           Get-Location
@@ -26,17 +26,17 @@ jobs:
           Get-Command make -ErrorAction SilentlyContinue | Select-Object Name, Source
       - name: Test backend
         working-directory: ./backend
-        shell: pwsh
+        shell: powershell
         run: make test
       - name: Build backend
         working-directory: ./backend
-        shell: pwsh
+        shell: powershell
         run: make build
       - name: Test frontend 
         working-directory: ./frontend
-        shell: pwsh
+        shell: powershell
         run: echo NO_TESTS
       - name: Build frontend
         working-directory: ./frontend
-        shell: pwsh
+        shell: powershell
         run: echo NO_BUILD_SCRIPT
