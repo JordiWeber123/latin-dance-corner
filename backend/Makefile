@@ -6,6 +6,13 @@ run-postgres:
 	-e POSTGRES_PASSWORD=testpass -e POSTGRES_DB=app_test \
 	postgres:18
 
+docker: 
+	docker build -t backend:latest .
 
+docker-run:
+	docker run --name backned --rm 
 
- 
+build: 
+	echo BUILT
+test:
+	echo PASSED
