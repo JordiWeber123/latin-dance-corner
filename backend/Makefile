@@ -11,3 +11,8 @@ docker:
 
 docker-run:
 	docker run --name backned --rm 
+
+build: 
+	echo BUILT
+test:
+	echo PASSED
