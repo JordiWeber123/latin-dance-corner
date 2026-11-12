@@ -41,6 +41,7 @@ func TestGetId(t *testing.T){
 	if err != nil {
 		t.Fatalf("unable to open database: %v", err.Error())
 	}
+	defer db.Close()
 	apiCfg := ApiConfig{DB: db}
 	
 	New(&apiCfg).ServeHTTP(rec, req)

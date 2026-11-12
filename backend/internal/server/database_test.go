@@ -15,6 +15,8 @@ func TestStoreRetrieve(t *testing.T){
 	if err != nil {
 		t.Fatalf("error while opening DB: %s", err.Error())
 	}
+	defer db.Close()
+	
 	toAdd := Move{
 		Name: "Inside turn",
 		DanceStyle: "Bachata",
