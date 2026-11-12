@@ -13,6 +13,7 @@ docker-run:
 	docker run --name backned --rm 
 
 build: 
-	echo BUILT
+#Should this just be the make docker instead?
+	go build ./cmd/api
 test:
-	echo PASSED
+	go test ./internal/server -v

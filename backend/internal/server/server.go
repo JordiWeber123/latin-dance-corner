@@ -30,7 +30,7 @@ func handleHello(w http.ResponseWriter, r *http.Request) {
 func (apiCfg *ApiConfig) handleGetId(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
-		writeError(w, "invalid_id", "invalid id, must be int", http.StatusNotFound)
+		writeError(w, "invalid_id", "invalid id, must be int", http.StatusBadRequest)
 		return
 	}
 
@@ -45,7 +45,7 @@ func (apiCfg *ApiConfig) handleGetId(w http.ResponseWriter, r *http.Request) {
 			writeError(w, "not_found", "move not found", http.StatusNotFound)	
 			return
 		}
-		writeError(w, "server_error0", "could not get move", http.StatusInternalServerError)
+		writeError(w, "server_error", "could not get move", http.StatusInternalServerError)
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"move" : move})
