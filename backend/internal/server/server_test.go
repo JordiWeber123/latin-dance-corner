@@ -5,6 +5,10 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"database/sql"
+ 	_ "github.com/jackc/pgx/v5/stdlib"
+
 )
 
 func TestHello(t *testing.T) {
@@ -33,7 +37,11 @@ func TestGetId(t *testing.T){
 	req := httptest.NewRequest(http.MethodGet, "/api/v1/move/1", nil)
 	rec := httptest.NewRecorder()
 	
-	apiCfg := ApiConfig{DB: nil}
+	db, err := sql.Open("pgx", TEST_DB_CONN)
+	if err != nil {
+		t.Fatalf("unable to open database: %v", err.Error())
+	}
+	apiCfg := ApiConfig{DB: db}
 	
 	New(&apiCfg).ServeHTTP(rec, req)
 
@@ -54,7 +62,11 @@ func TestGetId(t *testing.T){
 		Description: "Lead: Prepare a hand by raising it up between counts 3 and 4, then on 5 pass it over and around the follow's head, forming a circle",
 		Image: "img.png",}
 		
-	if body.Move != testMove{
+	if !(body.Move.Name == testMove.Name && 
+		body.Move.DanceStyle == testMove.DanceStyle &&
+		body.Move.Difficulty == testMove.Difficulty &&
+		body.Move.Description == testMove.Description && 
+		body.Move.Image == testMove.Image ){
 		t.Errorf("message = %v, want %v", body.Move, testMove)
 	}
 }
