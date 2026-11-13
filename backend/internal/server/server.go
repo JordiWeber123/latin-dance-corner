@@ -28,16 +28,13 @@ func handleHello(w http.ResponseWriter, r *http.Request) {
 }
 
 func (apiCfg *ApiConfig) handleGetId(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(r.PathValue("id"))
+	id, err := strconv.ParseUint(r.PathValue("id"), 10, 9)
 	if err != nil {
-		writeError(w, "invalid_id", "invalid id, must be int", http.StatusBadRequest)
+		writeError(w, "invalid_id", "invalid id, must be unsigend int", http.StatusBadRequest)
 		return
 	}
 
-	if id < 0 {
-		writeError(w, "invalid_id", "invalid id, must be positive", http.StatusBadRequest)
-		return
-	}
+
 
 	move, err := GetMoveById(apiCfg.DB, int64(id))
 	if err != nil {
@@ -54,40 +51,34 @@ func (apiCfg *ApiConfig) handleGetId(w http.ResponseWriter, r *http.Request) {
 func (apiCfg *ApiConfig) handleGetAll(w http.ResponseWriter, r *http.Request){
 	limitParam := r.URL.Query().Get("limit")
 	//prevent shadowing by declaring vars
-	var limit int
+	var limit uint64
 	var err error
 	
 	if limitParam == "" {
 		limit = 10
 	}else {
-		limit, err = strconv.Atoi(limitParam)
+		limit, err = strconv.ParseUint(limitParam, 10, 0)
 		if err != nil {
-			writeError(w, "bad_argument", "limit could not be parsed", http.StatusBadRequest)	
-			return
-		}
-		if limit < 0 {
-			writeError(w, "bad_argument", "limit must be nonnegative", http.StatusBadRequest)
+			writeError(w, "bad_argument", "limit could not be parsed, must be unsigned int", 
+				http.StatusBadRequest)	
 			return
 		}
 	}
 
 	offsetParam := r.URL.Query().Get("offset")
-	var offset int
+	var offset uint64
 	if offsetParam == "" {
 		offset = 0
 	}else {
-		offset, err = strconv.Atoi(offsetParam)
+		offset, err = strconv.ParseUint(offsetParam, 10, 0)
 		if err != nil {
-			writeError(w, "bad_argument", "offset could not be parsed", http.StatusBadRequest)	
-			return
-		}
-		if offset < 0 {
-			writeError(w, "bad_argument", "offset must be nonnegative", http.StatusBadRequest)
+			writeError(w, "bad_argument", "offset could not be parsed, must be unsinged int",
+				http.StatusBadRequest)	
 			return
 		}
 	}
 
-	moves, err := GetMultiPaginated(apiCfg.DB, limit, offset)
+	moves, err := GetMultiPaginated(apiCfg.DB, uint(limit), uint(offset))
 	if err != nil {
 		writeError(w, "internal_error", "could not get resource", http.StatusInternalServerError)
 		log.Printf("error in server: %s", err.Error())
